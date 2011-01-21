@@ -117,46 +117,100 @@ int qsort_entry(const void *a, const void *b) {
 			*(kpass_entry * const *) b, 0);
 }
 
-int main(int argc, char* argv[]) {
-	int dbs_len = 2;
-	kpass_db **dbs = malloc(dbs_len * sizeof(*dbs));
-	int dbs_used = 0;
+kpass_db* open_file(char* filename, int tries) {
+	char *password;
+	char *prompt;
+	char *bn = basename(filename);
+	char *fmt = "Password for \"%s\":";
+	int plen = snprintf(NULL, 0, fmt, bn) + 1;
+	kpass_db *db = NULL;
+	int i = 0;
 
-	int i, target, source;
+	prompt = malloc(plen);
+
+	snprintf(prompt, plen + 1, fmt, bn);
+
+	for(i = 0; i < tries; i++) {
+//		password = getpass(prompt);
+		password = "test";
+		
+		db = open_db(filename, password);
+
+		if(db) // open successful
+			break;
+	}
+	free(prompt);
+	return db;
+}
+
+int save_db(char* filename, kpass_db* db, char* password) {
+	int fd, size, out;
+	char* buf;
+	uint8_t pw_hash[32];
+	kpass_retval retval;
+
+	// FIXME: Keep hashes so we don't have to get a new password
+	retval = kpass_hash_pw(db, password, pw_hash);
+	if(retval) {
+		printf("hash of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
+		return retval;
+	}
+
+	size = kpass_db_encrypted_len(db);
+
+	buf = malloc(size);
+
+	retval = kpass_encrypt_db(db, pw_hash, buf);
+	if(retval) {
+		printf("encrypt of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
+		free(buf);
+		return retval;
+	}
+
+	fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, 0777);
+	if(fd < 0) {
+		printf("open of \"%s\" failed: %m\n", filename);
+		free(buf);
+		return -1;
+	}
+	
+	out = write(fd, buf, size);
+	if(out < size) {
+		if( out == -1)
+			printf("write of \"%s\" failed: %m\n", filename);
+		else
+			printf("write of \"%s\" failed: not enough bytes written\n", filename);
+		free(buf);
+		close(fd);
+		return -1;
+	}
+
+	out = close(fd);
+	if(out == -1) {
+		printf("close of \"%s\" failed: %m\n", filename);
+		free(buf);
+		return -1;
+	}
+
+	free(buf);
+	return 0;
+}
+
+int main(int argc, char* argv[]) {
+	kpass_db *dbs[2];
+	char* dest;
+	int i;
+	int mod = 0;
+
+	int target, source;
 
 	if(argc != 3) return 1;
 
-	for(i = 1; i < argc; i++) {
-		char *password;
-		kpass_db *next;
-		char *prompt;
-		char *bn = basename(argv[i]);
-		char *fmt = "Password for \"%s\":";
-		int plen = snprintf(NULL, 0, fmt, bn) + 1;
+	dbs[0] = open_file(argv[1], 3);
+	dbs[1] = open_file(argv[2], 3);
 
-//		printf("Working on %s\n", argv[i]);
-
-		prompt = malloc(plen);
-
-		snprintf(prompt, plen + 1, fmt, bn);
-
-		password = getpass(prompt);
-
-		next = open_db(argv[i], password);
-		if(next) {
-			if(dbs_len == dbs_used) {
-				dbs_len += 10;
-				dbs = realloc(dbs, dbs_len);
-			}
-			dbs[dbs_used] = next;
-			dbs_used++;
-		} else {
-			// Load DB failed.  Just quit for now
-			exit(1);
-		}
-
-		free(prompt);
-	}
+	if(!dbs[0] && !dbs[1])
+		return 1;
 
 	source = 0;
 	target = 1;
@@ -197,6 +251,7 @@ int main(int argc, char* argv[]) {
 
 			printf("Replace entry? (yes/no) ");
 			if(yesno()) {
+				mod = 1;
 				printf("Swapping entries...\n");
 				source_i = find_entry_index_ptr(dbs[source], source_e);
 				tmp = dbs[source]->entries[source_i];
@@ -219,6 +274,18 @@ int main(int argc, char* argv[]) {
 			continue;
 		print_entry(dbs[target]->entries[i]);
 	}*/
+
+	if(mod) {
+		dest = malloc(strlen(argv[target]) + 5);
+		strcpy(dest, argv[target]);
+		strcat(dest, ".new");
+		printf("Saving modified DB to %s\n", dest);
+
+		save_db(dest, dbs[target], "test");
+		free(dest);
+	} else {
+		printf("No changes found, not bothering saving.\n");
+	}
 
 	return 0;
 }
