@@ -32,11 +32,10 @@
 
 #include "util.h"
 
-kpass_db* open_db(char *filename, char *password) {
+kpass_db* open_db(char *filename, uint8_t *pw_hash) {
 	uint8_t *file = NULL;
 	int length;
 	int fd;
-	char pw_hash[32];
 	struct stat sb;
 	kpass_db *db;
 	kpass_retval retval;
@@ -70,16 +69,6 @@ kpass_db* open_db(char *filename, char *password) {
 		close(fd);
 		return NULL;
 	}
-
-	retval = kpass_hash_pw(db, password, pw_hash);
-	if(retval) {
-		printf("hash of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
-		munmap(file, length);
-		close(fd);
-		return NULL;
-	}
-	if(retval) exit(retval);
-
 	
 	retval = kpass_decrypt_db(db, pw_hash);
 	if(retval) {
@@ -117,44 +106,45 @@ int qsort_entry(const void *a, const void *b) {
 			*(kpass_entry * const *) b, 0);
 }
 
-kpass_db* open_file(char* filename, int tries) {
+kpass_retval open_file(char* filename, kpass_db **db, uint8_t pw_hash[32], int tries) {
 	char *password;
 	char *prompt;
 	char *bn = basename(filename);
 	char *fmt = "Password for \"%s\":";
 	int plen = snprintf(NULL, 0, fmt, bn) + 1;
-	kpass_db *db = NULL;
 	int i = 0;
+	kpass_retval retval;
 
 	prompt = malloc(plen);
 
 	snprintf(prompt, plen + 1, fmt, bn);
 
 	for(i = 0; i < tries; i++) {
-//		password = getpass(prompt);
-		password = "test";
-		
-		db = open_db(filename, password);
+		password = getpass(prompt);
+//		password = "test";
 
-		if(db) // open successful
+		retval = kpass_hash_pw(*db, password, pw_hash);
+		if(retval) {
+			printf("hash of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
+			return retval;
+		}
+
+		memset(password, 0, strlen(password));
+
+		*db = open_db(filename, pw_hash);
+
+		if(*db) // open successful
 			break;
 	}
 	free(prompt);
-	return db;
+
+	return 0;
 }
 
-int save_db(char* filename, kpass_db* db, char* password) {
+int save_db(char* filename, kpass_db* db, uint8_t* pw_hash) {
 	int fd, size, out;
 	char* buf;
-	uint8_t pw_hash[32];
 	kpass_retval retval;
-
-	// FIXME: Keep hashes so we don't have to get a new password
-	retval = kpass_hash_pw(db, password, pw_hash);
-	if(retval) {
-		printf("hash of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
-		return retval;
-	}
 
 	size = kpass_db_encrypted_len(db);
 
@@ -198,6 +188,7 @@ int save_db(char* filename, kpass_db* db, char* password) {
 
 int main(int argc, char* argv[]) {
 	kpass_db *dbs[2];
+	uint8_t pw_hash[2][32];
 	char* dest;
 	int i;
 	int mod = 0;
@@ -206,8 +197,10 @@ int main(int argc, char* argv[]) {
 
 	if(argc != 3) return 1;
 
-	dbs[0] = open_file(argv[1], 3);
-	dbs[1] = open_file(argv[2], 3);
+	if(open_file(argv[1], &dbs[0], pw_hash[0], 3) ||
+		open_file(argv[2], &dbs[1], pw_hash[1], 3)) {
+		printf("Open file failed somehow\n");
+	}
 
 	if(!dbs[0] && !dbs[1])
 		return 1;
@@ -281,7 +274,7 @@ int main(int argc, char* argv[]) {
 		strcat(dest, ".new");
 		printf("Saving modified DB to %s\n", dest);
 
-		save_db(dest, dbs[target], "test");
+		save_db(dest, dbs[target], pw_hash[target]);
 		free(dest);
 	} else {
 		printf("No changes found, not bothering saving.\n");
