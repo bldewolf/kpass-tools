@@ -33,7 +33,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = clkpass$(EXEEXT) kpmerge$(EXEEXT)
+bin_PROGRAMS = kputil$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
@@ -82,13 +82,10 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_clkpass_OBJECTS = clkpass.$(OBJEXT)
-clkpass_OBJECTS = $(am_clkpass_OBJECTS)
-clkpass_LDADD = $(LDADD)
-am_kpmerge_OBJECTS = kpmerge.$(OBJEXT) util.$(OBJEXT) yesno.$(OBJEXT) \
-	getpass.$(OBJEXT)
-kpmerge_OBJECTS = $(am_kpmerge_OBJECTS)
-kpmerge_LDADD = $(LDADD)
+am_kputil_OBJECTS = main.$(OBJEXT) util.$(OBJEXT) merge.$(OBJEXT) \
+	list.$(OBJEXT) yesno.$(OBJEXT) getpass.$(OBJEXT)
+kputil_OBJECTS = $(am_kputil_OBJECTS)
+kputil_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -102,8 +99,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(clkpass_SOURCES) $(kpmerge_SOURCES)
-DIST_SOURCES = $(clkpass_SOURCES) $(kpmerge_SOURCES)
+SOURCES = $(kputil_SOURCES)
+DIST_SOURCES = $(kputil_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -714,8 +711,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-clkpass_SOURCES = src/clkpass.c
-kpmerge_SOURCES = src/kpmerge.c src/util.c lib/yesno.c lib/getpass.c
+kputil_SOURCES = src/main.c src/util.c src/merge.c src/list.c lib/yesno.c lib/getpass.c
 SUBDIRS = lib
 EXTRA_DIST = m4/gnulib-cache.m4
 all: config.h
@@ -817,12 +813,9 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-clkpass$(EXEEXT): $(clkpass_OBJECTS) $(clkpass_DEPENDENCIES) 
-	@rm -f clkpass$(EXEEXT)
-	$(LINK) $(clkpass_OBJECTS) $(clkpass_LDADD) $(LIBS)
-kpmerge$(EXEEXT): $(kpmerge_OBJECTS) $(kpmerge_DEPENDENCIES) 
-	@rm -f kpmerge$(EXEEXT)
-	$(LINK) $(kpmerge_OBJECTS) $(kpmerge_LDADD) $(LIBS)
+kputil$(EXEEXT): $(kputil_OBJECTS) $(kputil_DEPENDENCIES) 
+	@rm -f kputil$(EXEEXT)
+	$(LINK) $(kputil_OBJECTS) $(kputil_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -830,9 +823,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clkpass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getpass.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kpmerge.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/merge.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/yesno.Po@am__quote@
 
@@ -857,33 +851,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-clkpass.o: src/clkpass.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT clkpass.o -MD -MP -MF $(DEPDIR)/clkpass.Tpo -c -o clkpass.o `test -f 'src/clkpass.c' || echo '$(srcdir)/'`src/clkpass.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/clkpass.Tpo $(DEPDIR)/clkpass.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/clkpass.c' object='clkpass.o' libtool=no @AMDEPBACKSLASH@
+main.o: src/main.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT main.o -MD -MP -MF $(DEPDIR)/main.Tpo -c -o main.o `test -f 'src/main.c' || echo '$(srcdir)/'`src/main.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/main.Tpo $(DEPDIR)/main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/main.c' object='main.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o clkpass.o `test -f 'src/clkpass.c' || echo '$(srcdir)/'`src/clkpass.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o main.o `test -f 'src/main.c' || echo '$(srcdir)/'`src/main.c
 
-clkpass.obj: src/clkpass.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT clkpass.obj -MD -MP -MF $(DEPDIR)/clkpass.Tpo -c -o clkpass.obj `if test -f 'src/clkpass.c'; then $(CYGPATH_W) 'src/clkpass.c'; else $(CYGPATH_W) '$(srcdir)/src/clkpass.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/clkpass.Tpo $(DEPDIR)/clkpass.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/clkpass.c' object='clkpass.obj' libtool=no @AMDEPBACKSLASH@
+main.obj: src/main.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT main.obj -MD -MP -MF $(DEPDIR)/main.Tpo -c -o main.obj `if test -f 'src/main.c'; then $(CYGPATH_W) 'src/main.c'; else $(CYGPATH_W) '$(srcdir)/src/main.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/main.Tpo $(DEPDIR)/main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/main.c' object='main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o clkpass.obj `if test -f 'src/clkpass.c'; then $(CYGPATH_W) 'src/clkpass.c'; else $(CYGPATH_W) '$(srcdir)/src/clkpass.c'; fi`
-
-kpmerge.o: src/kpmerge.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT kpmerge.o -MD -MP -MF $(DEPDIR)/kpmerge.Tpo -c -o kpmerge.o `test -f 'src/kpmerge.c' || echo '$(srcdir)/'`src/kpmerge.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/kpmerge.Tpo $(DEPDIR)/kpmerge.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/kpmerge.c' object='kpmerge.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o kpmerge.o `test -f 'src/kpmerge.c' || echo '$(srcdir)/'`src/kpmerge.c
-
-kpmerge.obj: src/kpmerge.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT kpmerge.obj -MD -MP -MF $(DEPDIR)/kpmerge.Tpo -c -o kpmerge.obj `if test -f 'src/kpmerge.c'; then $(CYGPATH_W) 'src/kpmerge.c'; else $(CYGPATH_W) '$(srcdir)/src/kpmerge.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/kpmerge.Tpo $(DEPDIR)/kpmerge.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/kpmerge.c' object='kpmerge.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o kpmerge.obj `if test -f 'src/kpmerge.c'; then $(CYGPATH_W) 'src/kpmerge.c'; else $(CYGPATH_W) '$(srcdir)/src/kpmerge.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o main.obj `if test -f 'src/main.c'; then $(CYGPATH_W) 'src/main.c'; else $(CYGPATH_W) '$(srcdir)/src/main.c'; fi`
 
 util.o: src/util.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT util.o -MD -MP -MF $(DEPDIR)/util.Tpo -c -o util.o `test -f 'src/util.c' || echo '$(srcdir)/'`src/util.c
@@ -898,6 +878,34 @@ util.obj: src/util.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/util.c' object='util.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o util.obj `if test -f 'src/util.c'; then $(CYGPATH_W) 'src/util.c'; else $(CYGPATH_W) '$(srcdir)/src/util.c'; fi`
+
+merge.o: src/merge.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT merge.o -MD -MP -MF $(DEPDIR)/merge.Tpo -c -o merge.o `test -f 'src/merge.c' || echo '$(srcdir)/'`src/merge.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/merge.Tpo $(DEPDIR)/merge.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/merge.c' object='merge.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o merge.o `test -f 'src/merge.c' || echo '$(srcdir)/'`src/merge.c
+
+merge.obj: src/merge.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT merge.obj -MD -MP -MF $(DEPDIR)/merge.Tpo -c -o merge.obj `if test -f 'src/merge.c'; then $(CYGPATH_W) 'src/merge.c'; else $(CYGPATH_W) '$(srcdir)/src/merge.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/merge.Tpo $(DEPDIR)/merge.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/merge.c' object='merge.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o merge.obj `if test -f 'src/merge.c'; then $(CYGPATH_W) 'src/merge.c'; else $(CYGPATH_W) '$(srcdir)/src/merge.c'; fi`
+
+list.o: src/list.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT list.o -MD -MP -MF $(DEPDIR)/list.Tpo -c -o list.o `test -f 'src/list.c' || echo '$(srcdir)/'`src/list.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/list.Tpo $(DEPDIR)/list.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/list.c' object='list.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o list.o `test -f 'src/list.c' || echo '$(srcdir)/'`src/list.c
+
+list.obj: src/list.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT list.obj -MD -MP -MF $(DEPDIR)/list.Tpo -c -o list.obj `if test -f 'src/list.c'; then $(CYGPATH_W) 'src/list.c'; else $(CYGPATH_W) '$(srcdir)/src/list.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/list.Tpo $(DEPDIR)/list.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/list.c' object='list.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o list.obj `if test -f 'src/list.c'; then $(CYGPATH_W) 'src/list.c'; else $(CYGPATH_W) '$(srcdir)/src/list.c'; fi`
 
 yesno.o: lib/yesno.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT yesno.o -MD -MP -MF $(DEPDIR)/yesno.Tpo -c -o yesno.o `test -f 'lib/yesno.c' || echo '$(srcdir)/'`lib/yesno.c

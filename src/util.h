@@ -22,7 +22,23 @@
 
 #include <kpass.h>
 
+extern char *entry_field_names[];
+
+kpass_db* open_db(char *filename, uint8_t *pw_hash);
+
+int compare_entry(kpass_entry *a, kpass_entry *b, int date);
+
+int qsort_entry(const void *a, const void *b);
+
+kpass_retval open_file(char* filename, kpass_db **db, uint8_t pw_hash[32], int tries);
+
+int save_db(char* filename, kpass_db* db, uint8_t* pw_hash);
+
+void fix_group(kpass_db *db, int i);
+
 int is_metadata(kpass_entry *e);
+
+int entry_field_strn(kpass_entry *e, kpass_entry_type t, char *str, int n);
 
 void print_entry(kpass_entry *e);
 
@@ -34,6 +50,5 @@ int find_group_index_id(kpass_db *db, int id);
 
 void insert_entry(kpass_db *db, kpass_entry *e);
 
-extern char *entry_field_names[];
-
 void print_entry_diff(kpass_entry *a, kpass_entry *b);
+

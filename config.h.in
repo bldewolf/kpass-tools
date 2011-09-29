@@ -873,6 +873,9 @@
 # define __restrict__
 #endif
 
+/* Define to `unsigned int' if <sys/types.h> does not define. */
+#undef size_t
+
 /* Define as a signed type of the same size as size_t. */
 #undef ssize_t
 
