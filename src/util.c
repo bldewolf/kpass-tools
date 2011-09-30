@@ -37,7 +37,7 @@
 
 #include "util.h"
 
-#define BIT_SET(x, n) ((1 << n - 1) & x)
+#define BIT_SET(x, n) ((1 << (n) - 1) & (x))
 
 char *entry_field_names[kpass_entry_num_types] = {
 	"comment",
