@@ -52,9 +52,11 @@ int main(int argc, char* argv[]) {
 		puts("Missing first argument.\n");
 		print_help();
 	} else if(!strcmp(argv[1], "list")) {
-		list_main(argc - 1, argv + 1);
+		argv[1] = argv[0];
+		return list_main(argc - 1, argv + 1);
 	} else if(!strcmp(argv[1], "merge")) {
-		merge_main(argc - 1, argv + 1);
+		argv[1] = argv[0];
+		return merge_main(argc - 1, argv + 1);
 	} else if(!strcmp(argv[1], "help")) {
 		print_help();
 	} else if(!strcmp(argv[1], "version")) {
