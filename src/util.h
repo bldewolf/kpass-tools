@@ -23,6 +23,7 @@
 #include <kpass.h>
 
 extern char *entry_field_names[];
+extern char *group_field_names[];
 
 kpass_db* open_db(char *filename, uint8_t *pw_hash);
 
@@ -40,7 +41,11 @@ int is_metadata(kpass_entry *e);
 
 int entry_field_strn(kpass_entry *e, kpass_entry_type t, char *str, int n);
 
-void print_entry(kpass_entry *e);
+int group_field_strn(kpass_group *e, kpass_group_type t, char *str, int n);
+
+void print_entry(kpass_entry *e, int mask, int numeric);
+
+void print_group(kpass_group *e, int mask, int numeric);
 
 int compare_entry_field(kpass_entry_type t, kpass_entry *a, kpass_entry *b);
 

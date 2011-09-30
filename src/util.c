@@ -37,6 +37,8 @@
 
 #include "util.h"
 
+#define BIT_SET(x, n) ((1 << n - 1) & x)
+
 char *entry_field_names[kpass_entry_num_types] = {
 	"comment",
 	"UUID",
@@ -53,6 +55,19 @@ char *entry_field_names[kpass_entry_num_types] = {
 	"expiration time",
 	"binary description",
 	"binary data",
+	};
+
+char *group_field_names[kpass_group_num_types] = {
+	"comment",
+	"ID",
+	"name",
+	"creation time",
+	"last modification time",
+	"last access time",
+	"expiration time",
+	"image ID",
+	"level",
+	"flags",
 	};
 
 kpass_db* open_db(char *filename, uint8_t *pw_hash) {
@@ -92,7 +107,7 @@ kpass_db* open_db(char *filename, uint8_t *pw_hash) {
 		close(fd);
 		return NULL;
 	}
-	
+
 	retval = kpass_decrypt_db(db, pw_hash);
 	if(retval) {
 		printf("decrypt of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
@@ -116,7 +131,7 @@ int compare_entry(kpass_entry *a, kpass_entry *b, int date) {
 	res = compare_entry_field(kpass_entry_uuid, a, b);
 	if(!date || res)
 		return res;
-	
+
 	return compare_entry_field(kpass_entry_mtime, a, b);
 }
 
@@ -182,7 +197,7 @@ int save_db(char* filename, kpass_db* db, uint8_t* pw_hash) {
 		free(buf);
 		return -1;
 	}
-	
+
 	out = write(fd, buf, size);
 	if(out < size) {
 		if( out == -1)
@@ -277,15 +292,81 @@ int entry_field_strn(kpass_entry *e, kpass_entry_type t, char *str, int n) {
 	}
 }
 
-void print_entry(kpass_entry *e) {
+int group_field_strn(kpass_group *g, kpass_group_type t, char *str, int n) {
+	struct tm tms;
+	switch(t) {
+		case kpass_group_id:
+			snprintf(str, n, "%u", g->id);
+			return 0;
+		case kpass_group_name:
+			strncpy(str, g->name, n);
+			return 0;
+		case kpass_group_ctime:
+			memset(&tms, 0, sizeof(tms));
+			kpass_unpack_time(g->ctime, &tms);
+			strftime(str, n, "%Y-%m-%d %H:%M:%S", &tms);
+			return 0;
+		case kpass_group_mtime:
+			memset(&tms, 0, sizeof(tms));
+			kpass_unpack_time(g->mtime, &tms);
+			strftime(str, n, "%Y-%m-%d %H:%M:%S", &tms);
+			return 0;
+		case kpass_group_atime:
+			memset(&tms, 0, sizeof(tms));
+			kpass_unpack_time(g->atime, &tms);
+			strftime(str, n, "%Y-%m-%d %H:%M:%S", &tms);
+			return 0;
+		case kpass_group_etime:
+			memset(&tms, 0, sizeof(tms));
+			kpass_unpack_time(g->etime, &tms);
+			strftime(str, n, "%Y-%m-%d %H:%M:%S", &tms);
+			return 0;
+		case kpass_group_image_id:
+			snprintf(str, n, "%u", g->image_id);
+			return 0;
+		case kpass_group_level:
+			snprintf(str, n, "%hu", g->level);
+			return 0;
+		case kpass_group_flags:
+			snprintf(str, n, "%u", g->flags);
+			return 0;
+		default:
+			return 1;
+	}
+}
+
+void print_entry(kpass_entry *e, int mask, int numeric) {
 	char tmp[60];
 	kpass_entry_type i;
 
 	for(i = 1; i < kpass_entry_num_types; i++) {
+		if(!BIT_SET(mask, i))
+			continue;
 		int ret = entry_field_strn(e, i, tmp, 60);
 		if(ret) continue;
-		printf("%s: %s\n", entry_field_names[i], tmp);
-	}	
+		if(numeric) {
+			printf("%d: %s\n", i, tmp);
+		} else {
+			printf("%s: %s\n", entry_field_names[i], tmp);
+		}
+	}
+}
+
+void print_group(kpass_group *g, int mask, int numeric) {
+	char tmp[60];
+	kpass_entry_type i;
+
+	for(i = 1; i < kpass_group_num_types; i++) {
+		if(!BIT_SET(mask, i))
+			continue;
+		int ret = group_field_strn(g, i, tmp, 60);
+		if(ret) continue;
+		if(numeric) {
+			printf("%d: %s\n", i, tmp);
+		} else {
+			printf("%s: %s\n", group_field_names[i], tmp);
+		}
+	}
 }
 
 int compare_entry_field(kpass_entry_type t, kpass_entry *a, kpass_entry *b) {

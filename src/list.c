@@ -29,7 +29,14 @@ static void print_help() {
 	puts("kputil list - list contents of a database\n\
 Usage: kputil list <options> <files>\n\
 Available options:\n\
-    -h    displays help");
+    -e        show only entries\n\
+    -g        show only groups\n\
+    -E <mask> this mask restricts which fields are printed for entries\n\
+    -G <mask> this mask restricts which fields are printed for groups\n\
+    -m        show metadata elements (hidden by default)\n\
+    -n        show fields as numeric values rather than pretty strings\n\
+    -p <pw>   the password to unlock the database (taken interactively by default)\n\
+    -h        this displays the help");
 }
 
 int list_main(int argc, char* argv[]) {
@@ -41,18 +48,50 @@ int list_main(int argc, char* argv[]) {
 	int mod = 0;
 	char c;
 	kpass_retval retval;
+	int numeric = 0;
+	int metadata = 0;
+	int entry_mask = -1;
+	int group_mask = -1;
+	int show_only = 0;
 
-	while((c = getopt(argc, argv, "hp:")) != -1) {
+	while((c = getopt(argc, argv, "egE:G:hmnp:")) != -1) {
 		switch(c) {
+			case 'e':
+				show_only = c;
+				break;
+			case 'g':
+				show_only = c;
+				break;
+			case 'E':
+				entry_mask = atoi(optarg);
+				if(!entry_mask) {
+					fprintf(stderr, "Entry mask must be non-zero.\n");
+					return 1;
+				}
+				break;
+			case 'G':
+				group_mask = atoi(optarg);
+				if(!group_mask) {
+					fprintf(stderr, "Group mask must be non-zero.\n");
+					return 1;
+				}
+				break;
 			case 'h':
 				print_help();
 				return 0;
+			case 'm':
+				metadata = 1;
+				break;
+			case 'n':
+				numeric = 1;
+				break;
 			case 'p':
 				pw = optarg;
 				break;
 			case '?':
-				if(optopt == 'p') {
-					fprintf(stderr, "Option p requires an argument\n");
+				if(optopt == 'p' || optopt == 'E' || optopt == 'G') {
+//					getopt prints an error here already
+//					fprintf(stderr, "Option %c requires an argument\n", optopt);
 					return 1;
 				} else {
 					fprintf(stderr, "Unknown option `-%c'.\n", optopt);
@@ -88,11 +127,23 @@ int list_main(int argc, char* argv[]) {
 	if(!db)
 		return 1;
 
-	for(i = 0; i < db->entries_len; i++) {
-		if(is_metadata(db->entries[i]))
-			continue;
+	if(show_only == 0 || show_only == 'g') {
+		puts("Groups:");
 
-		print_entry(db->entries[i]);
+		for(i = 0; i < db->groups_len; i++) {
+			print_group(db->groups[i], group_mask, numeric);
+		}
+	}
+
+	if(show_only == 0 || show_only == 'e') {
+		puts("Entries:");
+
+		for(i = 0; i < db->entries_len; i++) {
+			if(!metadata && is_metadata(db->entries[i]))
+				continue;
+
+			print_entry(db->entries[i], entry_mask, numeric);
+		}
 	}
 
 	return 0;
