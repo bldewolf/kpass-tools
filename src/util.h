@@ -25,13 +25,15 @@
 extern char *entry_field_names[];
 extern char *group_field_names[];
 
-kpass_db* open_db(char *filename, uint8_t *pw_hash);
+kpass_retval open_db(char *filename, uint8_t *pw_hash, kpass_db **db);
 
 int compare_entry(kpass_entry *a, kpass_entry *b, int date);
 
 int qsort_entry(const void *a, const void *b);
 
-kpass_retval open_file(char* filename, kpass_db **db, uint8_t pw_hash[32], int tries);
+kpass_retval open_file(char* filename, kpass_db **db, char *pw, uint8_t pw_hash[32], int tries);
+
+kpass_retval open_file_interactive(char* filename, kpass_db **db, uint8_t pw_hash[32], int tries);
 
 int save_db(char* filename, kpass_db* db, uint8_t* pw_hash);
 

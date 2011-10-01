@@ -37,7 +37,7 @@
 
 #include "util.h"
 
-#define BIT_SET(x, n) ((1 << (n) - 1) & (x))
+#define BIT_SET(x, n) ((1 << ((n) - 1)) & (x))
 
 char *entry_field_names[kpass_entry_num_types] = {
 	"comment",
@@ -70,24 +70,23 @@ char *group_field_names[kpass_group_num_types] = {
 	"flags",
 	};
 
-kpass_db* open_db(char *filename, uint8_t *pw_hash) {
+kpass_retval open_db(char *filename, uint8_t *pw_hash, kpass_db **db) {
 	uint8_t *file = NULL;
 	int length;
 	int fd;
 	struct stat sb;
-	kpass_db *db;
 	kpass_retval retval;
 
 	fd = open(filename, O_RDONLY);
 	if(fd == -1) {
 		printf("open of \"%s\" failed: %m\n", filename);
-		return NULL;
+		return -1;
 	}
 
 	if(fstat(fd, &sb) == -1) {
 		printf("fstat of \"%s\" failed: %m\n", filename);
 		close(fd);
-		return NULL;
+		return -1;
 	}
 
 	length = sb.st_size;
@@ -96,36 +95,38 @@ kpass_db* open_db(char *filename, uint8_t *pw_hash) {
 	if(file == MAP_FAILED) {
 		printf("mmap of \"%s\" failed: %m\n", filename);
 		close(fd);
-		return NULL;
+		return -1;
 	}
 
-	db = malloc(sizeof(kpass_db));
-	retval = kpass_init_db(db, file, length);
+	*db = malloc(sizeof(kpass_db));
+	retval = kpass_init_db(*db, file, length);
 	if(retval) {
 		printf("init of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
+		free(*db);
+		*db = NULL;
 		munmap(file, length);
 		close(fd);
-		return NULL;
+		return retval;
 	}
 
-	retval = kpass_decrypt_db(db, pw_hash);
+	retval = kpass_decrypt_db(*db, pw_hash);
 	if(retval) {
 		printf("decrypt of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
+		free(*db);
+		*db = NULL;
 		munmap(file, length);
 		close(fd);
-		return NULL;
+		return retval;
 	}
 
 	munmap(file, length);
 	close(fd);
-	return db;
+	return 0;
 }
 
 // date controls whether we compare mtime
 int compare_entry(kpass_entry *a, kpass_entry *b, int date) {
 	int res;
-	struct tm atm, btm;
-	time_t atime, btime;
 
 	// If the UUIDs don't match, return the difference
 	res = compare_entry_field(kpass_entry_uuid, a, b);
@@ -140,14 +141,29 @@ int qsort_entry(const void *a, const void *b) {
 			*(kpass_entry * const *) b, 0);
 }
 
-kpass_retval open_file(char* filename, kpass_db **db, uint8_t pw_hash[32], int tries) {
+kpass_retval open_file(char* filename, kpass_db **db, char* pw, uint8_t pw_hash[32], int tries) {
+	kpass_retval retval = -1;
+	if(!pw) {
+		return open_file_interactive(filename, db, pw_hash, tries);
+	}
+
+	retval = kpass_hash_pw(*db, pw, pw_hash);
+	if(retval) {
+		printf("hash of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
+		return retval;
+	}
+	return open_db(filename, pw_hash, db);
+}
+
+
+kpass_retval open_file_interactive(char* filename, kpass_db **db, uint8_t pw_hash[32], int tries) {
 	char *password;
 	char *prompt;
 	char *bn = basename(filename);
 	char *fmt = "Password for \"%s\":";
 	int plen = snprintf(NULL, 0, fmt, bn) + 1;
 	int i = 0;
-	kpass_retval retval;
+	kpass_retval retval = -1;
 
 	prompt = malloc(plen);
 
@@ -155,24 +171,23 @@ kpass_retval open_file(char* filename, kpass_db **db, uint8_t pw_hash[32], int t
 
 	for(i = 0; i < tries; i++) {
 		password = getpass(prompt);
-//		password = "test";
 
 		retval = kpass_hash_pw(*db, password, pw_hash);
 		if(retval) {
 			printf("hash of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
-			return retval;
+			break;
 		}
 
 		memset(password, 0, strlen(password));
 
-		*db = open_db(filename, pw_hash);
+		retval = open_db(filename, pw_hash, db);
 
-		if(*db) // open successful
+		if(!retval || retval == -1) // open successful or received non-kpass error
 			break;
 	}
 	free(prompt);
 
-	return 0;
+	return retval;
 }
 
 int save_db(char* filename, kpass_db* db, uint8_t* pw_hash) {
@@ -354,7 +369,7 @@ void print_entry(kpass_entry *e, int mask, int numeric) {
 
 void print_group(kpass_group *g, int mask, int numeric) {
 	char tmp[60];
-	kpass_entry_type i;
+	kpass_group_type i;
 
 	for(i = 1; i < kpass_group_num_types; i++) {
 		if(!BIT_SET(mask, i))

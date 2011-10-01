@@ -39,11 +39,12 @@ static void print_help() {
 Usage: <mode> <mode options>\n\
 Available modes:\n\
 	list\n\
+	copy\n\
 	merge\n\
 	help\n\
 	version\n\
 \n\
-See --help in each mode for mode-specific options.");
+See -h in each mode for mode-specific options.");
 }
 
 
@@ -54,6 +55,9 @@ int main(int argc, char* argv[]) {
 	} else if(!strcmp(argv[1], "list")) {
 		argv[1] = argv[0];
 		return list_main(argc - 1, argv + 1);
+	} else if(!strcmp(argv[1], "copy")) {
+		argv[1] = argv[0];
+		return copy_main(argc - 1, argv + 1);
 	} else if(!strcmp(argv[1], "merge")) {
 		argv[1] = argv[0];
 		return merge_main(argc - 1, argv + 1);

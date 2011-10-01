@@ -46,6 +46,7 @@ int list_main(int argc, char* argv[]) {
 	char* pw = NULL;
 	int i;
 	int mod = 0;
+	int dbind;
 	char c;
 	kpass_retval retval;
 	int numeric = 0;
@@ -109,40 +110,34 @@ int list_main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	if(pw) {
-		retval = kpass_hash_pw(NULL, pw, pw_hash);
-		if(retval) {
-			fprintf(stderr, "Failed to hash password: %s\n", kpass_error_str[retval]);
-			return retval;
-		}
-
-		db = open_db(argv[optind], pw_hash);
-	} else {
-		if(open_file(argv[optind], &db, pw_hash, 3)) {
+	for(dbind = optind; dbind < argc; dbind++) {
+		if(open_file(argv[dbind], &db, pw, pw_hash, 3)) {
 			fprintf(stderr, "Open file failed\n");
 			return 1;
 		}
-	}
 
-	if(!db)
-		return 1;
+		if(!db)
+			return 1;
 
-	if(show_only == 0 || show_only == 'g') {
-		puts("Groups:");
+		printf("Database: %s\n", argv[dbind]);
 
-		for(i = 0; i < db->groups_len; i++) {
-			print_group(db->groups[i], group_mask, numeric);
+		if(show_only == 0 || show_only == 'g') {
+			puts("Groups:");
+
+			for(i = 0; i < db->groups_len; i++) {
+				print_group(db->groups[i], group_mask, numeric);
+			}
 		}
-	}
 
-	if(show_only == 0 || show_only == 'e') {
-		puts("Entries:");
+		if(show_only == 0 || show_only == 'e') {
+			puts("Entries:");
 
-		for(i = 0; i < db->entries_len; i++) {
-			if(!metadata && is_metadata(db->entries[i]))
-				continue;
+			for(i = 0; i < db->entries_len; i++) {
+				if(!metadata && is_metadata(db->entries[i]))
+					continue;
 
-			print_entry(db->entries[i], entry_mask, numeric);
+				print_entry(db->entries[i], entry_mask, numeric);
+			}
 		}
 	}
 

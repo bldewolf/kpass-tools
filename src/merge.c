@@ -37,8 +37,8 @@ int merge_main(int argc, char* argv[]) {
 
 	if(argc != 3) return 1;
 
-	if(open_file(argv[1], &dbs[0], pw_hash[0], 3) ||
-		open_file(argv[2], &dbs[1], pw_hash[1], 3)) {
+	if(open_file(argv[1], &dbs[0], NULL, pw_hash[0], 3) ||
+		open_file(argv[2], &dbs[1], NULL, pw_hash[1], 3)) {
 		puts("Open file failed somehow");
 	}
 
