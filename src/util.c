@@ -20,7 +20,6 @@
 
 /* These are helper functions that I might eventually merge into libkpass */
 
-#include <uuid/uuid.h>
 #include <sys/mman.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -478,6 +477,16 @@ int compare_entry_field(kpass_entry_type t, kpass_entry *a, kpass_entry *b) {
 		default:
 			return 0;
 	}
+}
+
+kpass_entry *find_entry_ptr_uuid(kpass_db *db, uuid_t uuid) {
+	int i;
+	for(i = 0; i < db->entries_len; i++) {
+		if(uuid_compare(uuid, db->entries[i]->uuid) == 0) {
+			return db->entries[i];
+		}
+	}
+	return NULL;
 }
 
 int find_entry_index_ptr(kpass_db *db, kpass_entry *e) {

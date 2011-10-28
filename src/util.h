@@ -22,6 +22,8 @@
 
 #include <kpass.h>
 
+#include <uuid/uuid.h>
+
 extern char *entry_field_names[];
 extern char *group_field_names[];
 
@@ -50,6 +52,8 @@ void print_entry(kpass_entry *e, int mask, int numeric);
 void print_group(kpass_group *e, int mask, int numeric);
 
 int compare_entry_field(kpass_entry_type t, kpass_entry *a, kpass_entry *b);
+
+kpass_entry *find_entry_ptr_uuid(kpass_db *db, uuid_t uuid);
 
 int find_entry_index_ptr(kpass_db *db, kpass_entry *e);
 

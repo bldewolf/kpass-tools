@@ -21,6 +21,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <uuid/uuid.h>
+
 #include <kpass.h>
 
 #include "util.h"
@@ -31,9 +33,9 @@ Usage: kputil copy <options> <UUIDs>\n\
 Available options:\n\
     -s        source database\n\
     -d        destination database\n\
-    -o        output database (if not specified, we clobber the destination)\n\
+    -o        output database (currently too timid to clobber)\n\
     -p <pw>   the password to unlock the databases (interactive otherwise)\n\
-              If -P is in effect, this password is used on the first database\n\
+              If -P is set, this password is used on the first database\n\
     -P <UUID> the UUID from the source database to use as the password for\n\
               the destination database\n\
     -r        reverses the order the databases are opened and causes -P to\n\
@@ -54,30 +56,32 @@ int copy_main(int argc, char* argv[]) {
 	char c;
 	kpass_retval retval;
 	char *src, *dst, *out;
+	kpass_entry *e;
+	uuid_t uuid;
 
 	while((c = getopt(argc, argv, "d:s:hp:P:o:r")) != -1) {
 		switch(c) {
-			case 'd':
-				dst = optarg;
-				break;
 			case 's':
 				src = optarg;
 				break;
-			case 'h':
-				print_help();
-				return 0;
+			case 'd':
+				dst = optarg;
+				break;
+			case 'o':
+				out = optarg;
+				break;
 			case 'p':
 				pw = optarg;
 				break;
 			case 'P':
 				pw_uuid = optarg;
 				break;
-			case 'o':
-				out = optarg;
-				break;
 			case 'r':
 				reverse = !reverse;
 				break;
+			case 'h':
+				print_help();
+				return 0;
 			case '?':
 				if(optopt == 'p' || optopt == 's' || optopt == 'd' || optopt == 'P' || optopt == 'o') {
 //					getopt prints an error here already
@@ -98,6 +102,18 @@ int copy_main(int argc, char* argv[]) {
 		fprintf(stderr, "No UUIDs specified.\n");
 		return 1;
 	}
+	if(!src) {
+		fprintf(stderr, "No source specified.\n");
+		return 1;
+	}
+	if(!dst) {
+		fprintf(stderr, "No destination specified.\n");
+		return 1;
+	}
+	if(!out) {
+		fprintf(stderr, "No output specified.\n");
+		return 1;
+	}
 
 //	Use pointer magic to accomodate reversed order in the case of using pw_uuid
 	if(!reverse) {
@@ -113,6 +129,21 @@ int copy_main(int argc, char* argv[]) {
 		return 1;
 	}
 
+//	find pw_uuid and replace pw with it
+	if(pw_uuid) {
+		if(uuid_parse(pw_uuid, uuid)) {
+			fprintf(stderr, "Failed to parse UUID \"%s\" for second database password\n", pw_uuid);
+			return 1;
+		}
+		e = find_entry_ptr_uuid(*db, uuid);
+		if(!e) {
+			fprintf(stderr, "No entry found for UUID \"%s\" in \"%s\" for second database password\n", pw_uuid, path);
+			return 1;
+		}
+		pw = e->password;
+	}
+
+//	More magic
 	if(reverse) {
 		path = src;
 		db = &sdb;
@@ -121,7 +152,6 @@ int copy_main(int argc, char* argv[]) {
 		db = &ddb;
 	}
 
-//	find pw_uuid and replace pw with it
 	if(open_file(path, db, pw, pw_hash, 3)) {
 		fprintf(stderr, "Open file \"%s\" failed\n", path);
 		return 1;
