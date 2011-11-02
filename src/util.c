@@ -489,6 +489,16 @@ kpass_entry *find_entry_ptr_uuid(kpass_db *db, uuid_t uuid) {
 	return NULL;
 }
 
+int find_entry_index_uuid(kpass_db *db, uuid_t uuid) {
+	int i;
+	for(i = 0; i < db->entries_len; i++) {
+		if(uuid_compare(uuid, db->entries[i]->uuid) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 int find_entry_index_ptr(kpass_db *db, kpass_entry *e) {
 	int i;
 	for(i = 0; i < db->entries_len; i++) {
@@ -507,6 +517,26 @@ int find_group_index_id(kpass_db *db, int id) {
 			return i;
 	}
 	return -1;
+}
+
+kpass_entry *remove_entry(kpass_db *db, uuid_t uuid) {
+	int i = find_entry_index_uuid(db, uuid);
+	kpass_entry *e;
+
+	if(i == -1)
+		return NULL;
+
+	e = db->entries[i];
+
+	// Shift entries left
+	for(i; i < db->entries_len - 1; i++) {
+		db->entries[i] = db->entries[i+1];
+	}
+
+	db->entries_len--;
+	db->entries = realloc(db->entries, db->entries_len * sizeof(*db->entries));
+
+	return e;
 }
 
 void insert_entry(kpass_db *db, kpass_entry *e) {

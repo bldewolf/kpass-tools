@@ -45,19 +45,18 @@ Available options:\n\
 
 int copy_main(int argc, char* argv[]) {
 	kpass_db *ddb, *sdb, **db;
-	uint8_t pw_hash[32];
+	uint8_t spwh[32];
+	uint8_t dpwh[32];
+	uint8_t *pwh;
 	char* path;
 	char* pw = NULL;
 	char* pw_uuid = NULL;
 	int reverse = 0;
-	int i;
-	int mod = 0;
-	int dbind;
 	char c;
-	kpass_retval retval;
 	char *src, *dst, *out;
 	kpass_entry *e;
 	uuid_t uuid;
+	int copied = 0;
 
 	while((c = getopt(argc, argv, "d:s:hp:P:o:r")) != -1) {
 		switch(c) {
@@ -119,25 +118,27 @@ int copy_main(int argc, char* argv[]) {
 	if(!reverse) {
 		path = src;
 		db = &sdb;
+		pwh = spwh;
 	} else {
 		path = dst;
 		db = &ddb;
+		pwh = dpwh;
 	}
 
-	if(open_file(path, db, pw, pw_hash, 3)) {
-		fprintf(stderr, "Open file \"%s\" failed\n", path);
+	if(open_file(path, db, pw, pwh, 3)) {
+		fprintf(stderr, "Open file %s failed\n", path);
 		return 1;
 	}
 
 //	find pw_uuid and replace pw with it
 	if(pw_uuid) {
 		if(uuid_parse(pw_uuid, uuid)) {
-			fprintf(stderr, "Failed to parse UUID \"%s\" for second database password\n", pw_uuid);
+			fprintf(stderr, "Failed to parse UUID %s for second database password\n", pw_uuid);
 			return 1;
 		}
 		e = find_entry_ptr_uuid(*db, uuid);
 		if(!e) {
-			fprintf(stderr, "No entry found for UUID \"%s\" in \"%s\" for second database password\n", pw_uuid, path);
+			fprintf(stderr, "No entry found for UUID %s in %s for second database password\n", pw_uuid, path);
 			return 1;
 		}
 		pw = e->password;
@@ -147,15 +148,48 @@ int copy_main(int argc, char* argv[]) {
 	if(reverse) {
 		path = src;
 		db = &sdb;
+		pwh = spwh;
 	} else {
 		path = dst;
 		db = &ddb;
+		pwh = dpwh;
 	}
 
-	if(open_file(path, db, pw, pw_hash, 3)) {
-		fprintf(stderr, "Open file \"%s\" failed\n", path);
+	if(open_file(path, db, pw, pwh, 3)) {
+		fprintf(stderr, "Open file %s failed\n", path);
 		return 1;
 	}
+
+//	Do the actual copying
+	for(; optind < argc; optind++) {
+		if(uuid_parse(argv[optind], uuid)) {
+			fprintf(stderr, "Failed to parse UUID %s for copying\n", argv[optind]);
+			continue;
+		}
+		if(find_entry_index_uuid(ddb, uuid) != -1) {
+			fprintf(stderr, "UUID %s already exists in %s\n", argv[optind], dst);
+			continue;
+		}
+
+		e = remove_entry(sdb, uuid);
+		if(!e) {
+			fprintf(stderr, "No entry found for UUID %s in %s\n", argv[optind], src);
+			return 1;
+		}
+		insert_entry(ddb, e);
+		copied++;
+	}
+	if(copied) {
+		save_db(out, ddb, dpwh);
+		printf("%d entries were copied.\n", copied);
+	} else {
+		puts("No entries were copied");
+	}
+
+	kpass_free_db(sdb);
+	free(sdb);
+	kpass_free_db(ddb);
+	free(ddb);
 
 	return 0;
 }

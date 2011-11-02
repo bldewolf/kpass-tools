@@ -55,9 +55,13 @@ int compare_entry_field(kpass_entry_type t, kpass_entry *a, kpass_entry *b);
 
 kpass_entry *find_entry_ptr_uuid(kpass_db *db, uuid_t uuid);
 
+int find_entry_index_uuid(kpass_db *db, uuid_t uuid);
+
 int find_entry_index_ptr(kpass_db *db, kpass_entry *e);
 
 int find_group_index_id(kpass_db *db, int id);
+
+kpass_entry *remove_entry(kpass_db *db, uuid_t uuid);
 
 void insert_entry(kpass_db *db, kpass_entry *e);
 
