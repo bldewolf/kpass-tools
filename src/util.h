@@ -59,7 +59,7 @@ int find_entry_index_uuid(kpass_db *db, uuid_t uuid);
 
 int find_entry_index_ptr(kpass_db *db, kpass_entry *e);
 
-int find_group_index_id(kpass_db *db, int id);
+int find_group_index_id(kpass_db *db, uint32_t id);
 
 kpass_entry *remove_entry(kpass_db *db, uuid_t uuid);
 

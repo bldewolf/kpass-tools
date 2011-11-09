@@ -162,7 +162,7 @@ kpass_retval open_file_interactive(char* filename, kpass_db **db, uint8_t pw_has
 	char *fmt = "Password for \"%s\":";
 	int plen = snprintf(NULL, 0, fmt, bn) + 1;
 	int i = 0;
-	kpass_retval retval = -1;
+	int retval;
 
 	prompt = malloc(plen);
 
@@ -191,8 +191,8 @@ kpass_retval open_file_interactive(char* filename, kpass_db **db, uint8_t pw_has
 
 int save_db(char* filename, kpass_db* db, uint8_t* pw_hash) {
 	int fd, size, out;
-	char* buf;
-	kpass_retval retval;
+	unsigned char* buf;
+	int retval;
 
 	size = kpass_db_encrypted_len(db);
 
@@ -480,7 +480,7 @@ int compare_entry_field(kpass_entry_type t, kpass_entry *a, kpass_entry *b) {
 }
 
 kpass_entry *find_entry_ptr_uuid(kpass_db *db, uuid_t uuid) {
-	int i;
+	uint32_t i;
 	for(i = 0; i < db->entries_len; i++) {
 		if(uuid_compare(uuid, db->entries[i]->uuid) == 0) {
 			return db->entries[i];
@@ -490,7 +490,7 @@ kpass_entry *find_entry_ptr_uuid(kpass_db *db, uuid_t uuid) {
 }
 
 int find_entry_index_uuid(kpass_db *db, uuid_t uuid) {
-	int i;
+	uint32_t i;
 	for(i = 0; i < db->entries_len; i++) {
 		if(uuid_compare(uuid, db->entries[i]->uuid) == 0) {
 			return i;
@@ -500,7 +500,7 @@ int find_entry_index_uuid(kpass_db *db, uuid_t uuid) {
 }
 
 int find_entry_index_ptr(kpass_db *db, kpass_entry *e) {
-	int i;
+	uint32_t i;
 	for(i = 0; i < db->entries_len; i++) {
 		if(db->entries[i] == e) {
 			return i;
@@ -509,8 +509,8 @@ int find_entry_index_ptr(kpass_db *db, kpass_entry *e) {
 	return -1;
 }
 
-int find_group_index_id(kpass_db *db, int id) {
-	int i;
+int find_group_index_id(kpass_db *db, uint32_t id) {
+	uint32_t i;
 
 	for(i = 0; i < db->groups_len; i++) {
 		if(db->groups[i]->id == id)
@@ -529,7 +529,7 @@ kpass_entry *remove_entry(kpass_db *db, uuid_t uuid) {
 	e = db->entries[i];
 
 	// Shift entries left
-	for(i; i < db->entries_len - 1; i++) {
+	for(; (uint32_t)i < db->entries_len - 1; i++) {
 		db->entries[i] = db->entries[i+1];
 	}
 

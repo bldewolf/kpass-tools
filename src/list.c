@@ -42,13 +42,10 @@ Available options:\n\
 int list_main(int argc, char* argv[]) {
 	kpass_db *db;
 	uint8_t pw_hash[32];
-	char* dest;
 	char* pw = NULL;
-	int i;
-	int mod = 0;
+	uint32_t i;
 	int dbind;
 	char c;
-	kpass_retval retval;
 	int numeric = 0;
 	int metadata = 0;
 	int entry_mask = -1;
