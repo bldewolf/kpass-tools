@@ -205,7 +205,7 @@ int save_db(char* filename, kpass_db* db, uint8_t* pw_hash) {
 		return retval;
 	}
 
-	fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, 0777);
+	fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, 0666);
 	if(fd < 0) {
 		printf("open of \"%s\" failed: %m\n", filename);
 		free(buf);
