@@ -1,0 +1,1 @@
+../../kputil merge -p test -s source.kdb -d destination.kdb -o output.kdb

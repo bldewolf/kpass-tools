@@ -1,0 +1,1 @@
+../../kputil copy -p test -s source.kdb -d destination.kdb -o output.kdb e317d84e-2e9f-e85b-32a5-384ba9ee8596
