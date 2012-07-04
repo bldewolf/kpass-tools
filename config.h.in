@@ -137,9 +137,6 @@
    don't. */
 #undef HAVE_DECL___FSETLOCKING
 
-/* Define to 1 if you have the <dlfcn.h> header file. */
-#undef HAVE_DLFCN_H
-
 /* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
 
@@ -667,10 +664,6 @@
 
 /* Define to 1 if lseek does not detect pipes. */
 #undef LSEEK_PIPE_BROKEN
-
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
-#undef LT_OBJDIR
 
 /* Define if the mbrtowc function has the NULL string argument bug. */
 #undef MBRTOWC_NULL_ARG_BUG
