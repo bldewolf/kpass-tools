@@ -1,5 +1,5 @@
 /*
-    clkpass, a command line client  for munging KeePass 1.x format files
+    kpass-tools, a collection of tools for munging KeePass 1.x format files
     Copyright (C) 2010 Brian De Wolf
 
     This program is free software: you can redistribute it and/or modify
