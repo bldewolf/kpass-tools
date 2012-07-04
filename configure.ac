@@ -1,6 +1,6 @@
 AC_PREREQ([2.65])
-AC_INIT([clkpass], [1], [clkpass@bldewolf.com], [clkpass], [http://sourceforge.net/projects/clkpass])
-AC_CONFIG_SRCDIR([src/clkpass.c])
+AC_INIT([kpass-tools], [1], [kpass-tools@bldewolf.com], [kpass-tools], [https://github.com/bldewolf/kpass-tools])
+AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 
@@ -13,7 +13,6 @@ AC_PROG_CC()
 gl_EARLY()
 AM_PROG_CC_C_O()
 AC_PROG_INSTALL()
-AC_PROG_LIBTOOL()
 
 gl_INIT()
 
