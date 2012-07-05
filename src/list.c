@@ -33,6 +33,7 @@ Available options:\n\
     -g        show only groups\n\
     -E <mask> this mask restricts which fields are printed for entries\n\
     -G <mask> this mask restricts which fields are printed for groups\n\
+    -b        brief output (sets brief group and entry masks)\n\
     -m        show metadata elements (hidden by default)\n\
     -n        show fields as numeric values rather than pretty strings\n\
     -p <pw>   the password to unlock the database (taken interactively by default)\n\
@@ -52,7 +53,7 @@ int list_main(int argc, char* argv[]) {
 	int group_mask = -1;
 	int show_only = 0;
 
-	while((c = getopt(argc, argv, "egE:G:hmnp:")) != -1) {
+	while((c = getopt(argc, argv, "egE:G:bmnp:h")) != -1) {
 		switch(c) {
 			case 'e':
 				show_only = c;
@@ -74,9 +75,10 @@ int list_main(int argc, char* argv[]) {
 					return 1;
 				}
 				break;
-			case 'h':
-				print_help();
-				return 0;
+			case 'b':
+				entry_mask = ((1<<kpass_entry_uuid) | (1<<kpass_entry_username) | (1<<kpass_entry_title)) >> 1;
+				group_mask = ((1<<kpass_group_id) | (1<<kpass_group_name)) >> 1;
+				break;
 			case 'm':
 				metadata = 1;
 				break;
@@ -86,6 +88,9 @@ int list_main(int argc, char* argv[]) {
 			case 'p':
 				pw = optarg;
 				break;
+			case 'h':
+				print_help();
+				return 0;
 			case '?':
 				if(optopt == 'p' || optopt == 'E' || optopt == 'G') {
 //					getopt prints an error here already
