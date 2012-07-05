@@ -38,11 +38,11 @@ static void print_help() {
 	puts("kpass-tools - command-line utility for managing KeePass 1.x databases.\n\
 Usage: <mode> <mode options>\n\
 Available modes:\n\
-	list\n\
-	copy\n\
-	merge\n\
-	help\n\
-	version\n\
+    list      list contents of a database\n\
+    copy      copy entries of a database to another\n\
+    merge     merge entries of a database to another\n\
+    help      display this\n\
+    version   print the version\n\
 \n\
 See -h in each mode for mode-specific options.");
 }
