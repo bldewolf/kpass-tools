@@ -191,18 +191,22 @@ int merge_main(int argc, char* argv[]) {
 			puts("The following differences were found:");
 			print_entry_diff(target_e, source_e);
 
-			printf("Replace entry? (yes/no) ");
+			printf("Update entry? (yes/no) ");
 			if(allyes || yesno()) {
 				mod++;
-				puts("Swapping entries...");
+				puts("Updating entry...");
+				// FIXME: This shouldn't need to swap, but I
+				// need to write a kpass_entry_copy to do it
+				// right
 				source_i = find_entry_index_ptr(sdb, source_e);
+				// Swap 'em
 				tmp = sdb->entries[source_i];
 				sdb->entries[source_i] = target_e;
 				ddb->entries[i] = tmp;
 
-				if(find_group_index_id(ddb, tmp->group_id) == -1) {
-					puts("Entry group ID not found, setting to first listed group.");
-					fix_group(ddb, i);
+				if(find_group_index_id(ddb, source_e->group_id) == -1) {
+					puts("New group ID not found, using old group ID.");
+					source_e->group_id = target_e->group_id;
 				}
 			} else {
 				puts("Skipping...");
@@ -217,6 +221,11 @@ int merge_main(int argc, char* argv[]) {
 		puts("No changes found, not bothering saving.");
 	}
 
+	kpass_free_db(sdb);
+	free(sdb);
+
+	kpass_free_db(ddb);
+	free(ddb);
 
 	return 0;
 
