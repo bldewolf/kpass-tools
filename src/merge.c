@@ -29,8 +29,8 @@
 #include "util.h"
 
 static void print_help() {
-	puts("kputil merge - merge entries of a database to another\n\
-Usage: kputil merge <options>\n\
+	puts("kpass-tools merge - merge entries of a database to another\n\
+Usage: kpass-tools merge <options>\n\
 Available options:\n\
     -s        source database\n\
     -d        destination database\n\

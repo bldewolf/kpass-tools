@@ -28,8 +28,8 @@
 #include "util.h"
 
 static void print_help() {
-	puts("kputil copy - copy entries of a database to another\n\
-Usage: kputil copy <options> <UUIDs>\n\
+	puts("kpass-tools copy - copy entries of a database to another\n\
+Usage: kpass-tools copy <options> <UUIDs>\n\
 Available options:\n\
     -s        source database\n\
     -d        destination database\n\

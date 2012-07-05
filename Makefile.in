@@ -50,7 +50,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = kputil$(EXEEXT)
+bin_PROGRAMS = kpass-tools$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -102,11 +102,11 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_kputil_OBJECTS = main.$(OBJEXT) util.$(OBJEXT) merge.$(OBJEXT) \
+am_kpass_tools_OBJECTS = main.$(OBJEXT) util.$(OBJEXT) merge.$(OBJEXT) \
 	list.$(OBJEXT) copy.$(OBJEXT) yesno.$(OBJEXT) \
 	getpass.$(OBJEXT)
-kputil_OBJECTS = $(am_kputil_OBJECTS)
-kputil_LDADD = $(LDADD)
+kpass_tools_OBJECTS = $(am_kpass_tools_OBJECTS)
+kpass_tools_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -115,8 +115,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(kputil_SOURCES)
-DIST_SOURCES = $(kputil_SOURCES)
+SOURCES = $(kpass_tools_SOURCES)
+DIST_SOURCES = $(kpass_tools_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -724,7 +724,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-kputil_SOURCES = src/main.c src/util.c src/merge.c src/list.c src/copy.c lib/yesno.c lib/getpass.c
+kpass_tools_SOURCES = src/main.c src/util.c src/merge.c src/list.c src/copy.c lib/yesno.c lib/getpass.c
 noinst_HEADERS = src/util.h
 SUBDIRS = lib
 EXTRA_DIST = m4/gnulib-cache.m4
@@ -822,9 +822,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-kputil$(EXEEXT): $(kputil_OBJECTS) $(kputil_DEPENDENCIES) $(EXTRA_kputil_DEPENDENCIES) 
-	@rm -f kputil$(EXEEXT)
-	$(LINK) $(kputil_OBJECTS) $(kputil_LDADD) $(LIBS)
+kpass-tools$(EXEEXT): $(kpass_tools_OBJECTS) $(kpass_tools_DEPENDENCIES) $(EXTRA_kpass_tools_DEPENDENCIES) 
+	@rm -f kpass-tools$(EXEEXT)
+	$(LINK) $(kpass_tools_OBJECTS) $(kpass_tools_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

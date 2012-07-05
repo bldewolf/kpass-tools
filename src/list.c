@@ -26,8 +26,8 @@
 #include "util.h"
 
 static void print_help() {
-	puts("kputil list - list contents of a database\n\
-Usage: kputil list <options> <files>\n\
+	puts("kpass-tools list - list contents of a database\n\
+Usage: kpass-tools list <options> <files>\n\
 Available options:\n\
     -e        show only entries\n\
     -g        show only groups\n\

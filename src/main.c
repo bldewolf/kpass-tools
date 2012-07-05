@@ -1,5 +1,5 @@
 /*
-    kputil, a command line client  for munging KeePass 1.x format files
+    kpass-tools, a command line client  for munging KeePass 1.x format files
     Copyright (C) 2010 Brian De Wolf
 
     This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@
 #include "config.h"
 
 static void print_help() {
-	puts("kputil - command-line utility for managing KeePass 1.x databases.\n\
+	puts("kpass-tools - command-line utility for managing KeePass 1.x databases.\n\
 Usage: <mode> <mode options>\n\
 Available modes:\n\
 	list\n\
