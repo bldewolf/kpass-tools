@@ -1,1 +1,1 @@
-../../kpass-tools merge -p test -s source.kdb -d destination.kdb -o output.kdb
+../../kpass-tools merge -p test -s source.kdb -d destination.kdb -o output.kdb -a
