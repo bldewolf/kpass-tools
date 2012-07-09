@@ -37,6 +37,7 @@ Available options:\n\
     -m        show metadata elements (hidden by default)\n\
     -n        show fields as numeric values rather than pretty strings\n\
     -p <pw>   the password to unlock the database (taken interactively by default)\n\
+    -s        sorts entries by UUID before printing\n\
     -h        this displays the help");
 }
 
@@ -52,8 +53,10 @@ int list_main(int argc, char* argv[]) {
 	int entry_mask = -1;
 	int group_mask = -1;
 	int show_only = 0;
+	int sort_entries = 0;
+	int num_dbs;
 
-	while((c = getopt(argc, argv, "egE:G:bmnp:h")) != -1) {
+	while((c = getopt(argc, argv, "egE:G:bmnp:sh")) != -1) {
 		switch(c) {
 			case 'e':
 				show_only = c;
@@ -88,6 +91,9 @@ int list_main(int argc, char* argv[]) {
 			case 'p':
 				pw = optarg;
 				break;
+			case 's':
+				sort_entries = 1;
+				break;
 			case 'h':
 				print_help();
 				return 0;
@@ -112,6 +118,7 @@ int list_main(int argc, char* argv[]) {
 		return 1;
 	}
 
+	num_dbs = argc - optind;
 	for(dbind = optind; dbind < argc; dbind++) {
 		if(open_file(argv[dbind], &db, pw, pw_hash, 3)) {
 			fprintf(stderr, "Open file failed\n");
@@ -121,7 +128,8 @@ int list_main(int argc, char* argv[]) {
 		if(!db)
 			return 1;
 
-		printf("Database: %s\n", argv[dbind]);
+		if(num_dbs > 1 )
+			printf("Database: %s\n", argv[dbind]);
 
 		if(show_only == 0 || show_only == 'g') {
 			puts("Groups:");
@@ -133,6 +141,10 @@ int list_main(int argc, char* argv[]) {
 
 		if(show_only == 0 || show_only == 'e') {
 			puts("Entries:");
+
+			if(sort_entries)
+				qsort(db->entries, db->entries_len,
+					sizeof(*db->entries), qsort_entry);
 
 			for(i = 0; i < db->entries_len; i++) {
 				if(!metadata && is_metadata(db->entries[i]))
