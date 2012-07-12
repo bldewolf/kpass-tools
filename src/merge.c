@@ -188,10 +188,13 @@ int merge_main(int argc, char* argv[]) {
 
 
 		if(source_e && compare_entry(source_e, target_e, 1) > 0) {
+			puts("In entry:");
+			print_entry(target_e, BRIEF_ENTRY_MASK, 0);
 			puts("The following differences were found:");
 			print_entry_diff(target_e, source_e);
 
-			printf("Update entry? (yes/no) ");
+			if(!allyes)
+				printf("Update entry? (yes/no) ");
 			if(allyes || yesno()) {
 				mod++;
 				puts("Updating entry...");
@@ -216,7 +219,10 @@ int merge_main(int argc, char* argv[]) {
 
 	if(mod) {
 		save_db(out, ddb, dpwh);
-		printf("%d entries were updated.\n", mod);
+		if(mod == 1)
+			puts("1 entry was updated.");
+		else
+			printf("%d entries were updated.\n", mod);
 	} else {
 		puts("No changes found, not bothering saving.");
 	}

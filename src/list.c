@@ -79,8 +79,8 @@ int list_main(int argc, char* argv[]) {
 				}
 				break;
 			case 'b':
-				entry_mask = ((1<<kpass_entry_uuid) | (1<<kpass_entry_username) | (1<<kpass_entry_title)) >> 1;
-				group_mask = ((1<<kpass_group_id) | (1<<kpass_group_name)) >> 1;
+				entry_mask = BRIEF_ENTRY_MASK;
+				group_mask = BRIEF_GROUP_MASK;
 				break;
 			case 'm':
 				metadata = 1;

@@ -24,6 +24,9 @@
 
 #include <uuid/uuid.h>
 
+#define BRIEF_ENTRY_MASK (((1<<kpass_entry_uuid) | (1<<kpass_entry_username) | (1<<kpass_entry_title)) >> 1)
+#define BRIEF_GROUP_MASK (((1<<kpass_group_id) | (1<<kpass_group_name)) >> 1)
+
 extern char *entry_field_names[];
 extern char *group_field_names[];
 
