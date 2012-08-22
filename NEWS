@@ -1,3 +1,7 @@
+Version 4, 20120822:
+Update gnulib to resolve some build errors
+Version 3, 20120712:
+Push through some output formatting stuff
 Version 2, 20120705:
 Rename binary from kputil to kpass-tools
 Modify merge group_id behavior
