@@ -1,5 +1,5 @@
 AC_PREREQ([2.65])
-AC_INIT([kpass-tools], [4], [kpass-tools@bldewolf.com], [kpass-tools], [https://github.com/bldewolf/kpass-tools])
+AC_INIT([kpass-tools], [5], [kpass-tools@bldewolf.com], [kpass-tools], [https://github.com/bldewolf/kpass-tools])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([build-aux])
@@ -17,7 +17,7 @@ AC_PROG_INSTALL()
 gl_INIT()
 
 # Checks for libraries.
-AC_CHECK_LIB([kpass], [kpass_init_db], [], [AC_MSG_ERROR([Libkpass required.]); exit 1])
+AC_CHECK_LIB([kpass], [kpass_strerror], [], [AC_MSG_ERROR([Libkpass 5 required.]); exit 1])
 AC_CHECK_LIB([uuid], [uuid_compare], [], [AC_MSG_ERROR([Libuuid required.]); exit 1])
 
 # Checks for header files.

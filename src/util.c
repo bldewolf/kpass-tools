@@ -100,7 +100,7 @@ kpass_retval open_db(char *filename, uint8_t *pw_hash, kpass_db **db) {
 	*db = malloc(sizeof(kpass_db));
 	retval = kpass_init_db(*db, file, length);
 	if(retval) {
-		printf("init of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
+		printf("init of \"%s\" failed: %s\n", filename, kpass_strerror(retval));
 		free(*db);
 		*db = NULL;
 		munmap(file, length);
@@ -110,7 +110,7 @@ kpass_retval open_db(char *filename, uint8_t *pw_hash, kpass_db **db) {
 
 	retval = kpass_decrypt_db(*db, pw_hash);
 	if(retval) {
-		printf("decrypt of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
+		printf("decrypt of \"%s\" failed: %s\n", filename, kpass_strerror(retval));
 		free(*db);
 		*db = NULL;
 		munmap(file, length);
@@ -146,11 +146,7 @@ kpass_retval open_file(char* filename, kpass_db **db, char* pw, uint8_t pw_hash[
 		return open_file_interactive(filename, db, pw_hash, tries);
 	}
 
-	retval = kpass_hash_pw(*db, pw, pw_hash);
-	if(retval) {
-		printf("hash of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
-		return retval;
-	}
+	kpass_hash_pw(pw, pw_hash);
 	return open_db(filename, pw_hash, db);
 }
 
@@ -171,11 +167,7 @@ kpass_retval open_file_interactive(char* filename, kpass_db **db, uint8_t pw_has
 	for(i = 0; i < tries; i++) {
 		password = getpass(prompt);
 
-		retval = kpass_hash_pw(*db, password, pw_hash);
-		if(retval) {
-			printf("hash of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
-			break;
-		}
+		kpass_hash_pw(password, pw_hash);
 
 		memset(password, 0, strlen(password));
 
@@ -200,7 +192,7 @@ int save_db(char* filename, kpass_db* db, uint8_t* pw_hash) {
 
 	retval = kpass_encrypt_db(db, pw_hash, buf);
 	if(retval) {
-		printf("encrypt of \"%s\" failed: %s\n", filename, kpass_error_str[retval]);
+		printf("encrypt of \"%s\" failed: %s\n", filename, kpass_strerror(retval));
 		free(buf);
 		return retval;
 	}
