@@ -31,5 +31,8 @@ AC_FUNC_MALLOC
 AC_FUNC_MMAP
 AC_CHECK_FUNCS([memset munmap])
 
+# Let's make gcc noisy
+CFLAGS="$CFLAGS -Wall"
+
 AC_CONFIG_FILES([Makefile lib/Makefile])
 AC_OUTPUT

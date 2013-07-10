@@ -1,6 +1,6 @@
 /*
-    kpass-tools, a collection of tools for munging KeePass 1.x format files
-    Copyright (C) 2010 Brian De Wolf
+    kpass-tools, a command line tool for munging KeePass 1.x format files
+    Copyright (C) 2013 Brian De Wolf
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ int copy_main(int argc, char* argv[]) {
 	char* pw_uuid = NULL;
 	int reverse = 0;
 	char c;
-	char *src, *dst, *out;
+	char *src = NULL, *dst = NULL, *out = NULL;
 	kpass_entry *e;
 	uuid_t uuid;
 	int copied = 0;

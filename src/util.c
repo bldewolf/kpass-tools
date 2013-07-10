@@ -1,6 +1,6 @@
 /*
-    kpass-tools, a collection of tools for munging KeePass 1.x format files
-    Copyright (C) 2010 Brian De Wolf
+    kpass-tools, a command line tool for munging KeePass 1.x format files
+    Copyright (C) 2013 Brian De Wolf
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -141,7 +141,6 @@ int qsort_entry(const void *a, const void *b) {
 }
 
 kpass_retval open_file(char* filename, kpass_db **db, char* pw, uint8_t pw_hash[32], int tries) {
-	kpass_retval retval = -1;
 	if(!pw) {
 		return open_file_interactive(filename, db, pw_hash, tries);
 	}
@@ -158,7 +157,7 @@ kpass_retval open_file_interactive(char* filename, kpass_db **db, uint8_t pw_has
 	char *fmt = "Password for \"%s\":";
 	int plen = snprintf(NULL, 0, fmt, bn) + 1;
 	int i = 0;
-	int retval;
+	int retval = -1;
 
 	prompt = malloc(plen);
 

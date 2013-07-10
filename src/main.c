@@ -1,6 +1,6 @@
 /*
-    kpass-tools, a command line client  for munging KeePass 1.x format files
-    Copyright (C) 2010 Brian De Wolf
+    kpass-tools, a command line tool for munging KeePass 1.x format files
+    Copyright (C) 2013 Brian De Wolf
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,10 @@
 
 #include "lib/getpass.h"
 #include "lib/yesno.h"
+
+#include "list.h"
+#include "copy.h"
+#include "merge.h"
 
 #include "util.h"
 
