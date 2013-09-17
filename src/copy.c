@@ -176,6 +176,9 @@ int copy_main(int argc, char* argv[]) {
 			fprintf(stderr, "No entry found for UUID %s in %s\n", argv[optind], src);
 			goto copy_failed;
 		}
+		if(find_group_index_id(ddb, e->group_id) == -1) {
+			fix_group(ddb, e);
+		}
 		insert_entry(ddb, e);
 		copied++;
 	}

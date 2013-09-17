@@ -534,10 +534,6 @@ void insert_entry(kpass_db *db, kpass_entry *e) {
 	db->entries_len++;
 	db->entries = realloc(db->entries, db->entries_len * sizeof(*db->entries));
 	db->entries[db->entries_len - 1] = e;
-
-	if(find_group_index_id(db, e->group_id) == -1) {
-		fix_group(db, db->entries_len - 1);
-	}
 }
 
 void print_entry_diff(kpass_entry *a, kpass_entry *b) {
