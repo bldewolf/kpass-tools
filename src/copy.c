@@ -82,14 +82,7 @@ int copy_main(int argc, char* argv[]) {
 				print_help();
 				return 0;
 			case '?':
-				if(optopt == 'p' || optopt == 's' || optopt == 'd' || optopt == 'P' || optopt == 'o') {
-//					getopt prints an error here already
-//					fprintf(stderr, "Option %c requires an argument\n", optopt);
-					return 1;
-				} else {
-					fprintf(stderr, "Unknown option `-%c'.\n", optopt);
-					return 1;
-				}
+				return 1;
 			default:
 				fprintf(stderr, "HOW DID I GET HERE\n");
 				return 1;
