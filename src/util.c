@@ -225,10 +225,6 @@ int save_db(char* filename, kpass_db* db, uint8_t* pw_hash) {
 	return 0;
 }
 
-void fix_group(kpass_db *db, int i) {
-	db->entries[i]->group_id = db->groups[0]->id;
-}
-
 int is_metadata(kpass_entry *e) {
 	return	e->data_len &&
 		e->desc && !strcmp(e->desc, "bin-stream") &&

@@ -42,8 +42,6 @@ kpass_retval open_file_interactive(char* filename, kpass_db **db, uint8_t pw_has
 
 int save_db(char* filename, kpass_db* db, uint8_t* pw_hash);
 
-void fix_group(kpass_db *db, int i);
-
 int is_metadata(kpass_entry *e);
 
 int entry_field_strn(kpass_entry *e, kpass_entry_type t, char *str, int n);

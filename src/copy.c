@@ -170,7 +170,7 @@ int copy_main(int argc, char* argv[]) {
 			goto copy_failed;
 		}
 		if(find_group_index_id(ddb, e->group_id) == -1) {
-			fix_group(ddb, find_entry_index_ptr(ddb, e));
+			e->group_id = ddb->groups[0]->id;
 		}
 		insert_entry(ddb, e);
 		copied++;
