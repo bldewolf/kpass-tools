@@ -164,13 +164,13 @@ int copy_main(int argc, char* argv[]) {
 			goto copy_failed;
 		}
 
-		e = remove_entry(sdb, uuid);
+		e = remove_entry_uuid(sdb, uuid);
 		if(!e) {
 			fprintf(stderr, "No entry found for UUID %s in %s\n", argv[optind], src);
 			goto copy_failed;
 		}
 		if(find_group_index_id(ddb, e->group_id) == -1) {
-			fix_group(ddb, e);
+			fix_group(ddb, find_entry_index_ptr(ddb, e));
 		}
 		insert_entry(ddb, e);
 		copied++;

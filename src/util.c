@@ -470,10 +470,23 @@ int compare_entry_field(kpass_entry_type t, kpass_entry *a, kpass_entry *b) {
 	}
 }
 
+/* TODO: If I need any more search functions, I should probably make a general
+ * function instead of lots of copy-pasta */
+
 kpass_entry *find_entry_ptr_uuid(kpass_db *db, uuid_t uuid) {
 	uint32_t i;
 	for(i = 0; i < db->entries_len; i++) {
 		if(uuid_compare(uuid, db->entries[i]->uuid) == 0) {
+			return db->entries[i];
+		}
+	}
+	return NULL;
+}
+
+kpass_entry *find_entry_ptr_title(kpass_db *db, char *title) {
+	uint32_t i;
+	for(i = 0; i < db->entries_len; i++) {
+		if(!strcmp(db->entries[i]->title, title)) {
 			return db->entries[i];
 		}
 	}
@@ -500,6 +513,16 @@ int find_entry_index_ptr(kpass_db *db, kpass_entry *e) {
 	return -1;
 }
 
+int find_entry_index_title(kpass_db *db, char *title) {
+	uint32_t i;
+	for(i = 0; i < db->entries_len; i++) {
+		if(!strcmp(db->entries[i]->title, title)) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 int find_group_index_id(kpass_db *db, uint32_t id) {
 	uint32_t i;
 
@@ -510,12 +533,26 @@ int find_group_index_id(kpass_db *db, uint32_t id) {
 	return -1;
 }
 
-kpass_entry *remove_entry(kpass_db *db, uuid_t uuid) {
-	int i = find_entry_index_uuid(db, uuid);
-	kpass_entry *e;
+kpass_entry *remove_entry_title(kpass_db *db, char *title) {
+	int i = find_entry_index_title(db, title);
 
 	if(i == -1)
 		return NULL;
+
+	return remove_entry_index(db, i);
+}
+
+kpass_entry *remove_entry_uuid(kpass_db *db, uuid_t uuid) {
+	int i = find_entry_index_uuid(db, uuid);
+
+	if(i == -1)
+		return NULL;
+
+	return remove_entry_index(db, i);
+}
+
+kpass_entry *remove_entry_index(kpass_db *db, int i) {
+	kpass_entry *e;
 
 	e = db->entries[i];
 
