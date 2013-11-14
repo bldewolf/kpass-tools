@@ -33,6 +33,7 @@
 #include "list.h"
 #include "copy.h"
 #include "merge.h"
+#include "entry.h"
 
 #include "util.h"
 
@@ -45,6 +46,7 @@ Available modes:\n\
     list      list contents of a database\n\
     copy      copy entries of a database to another\n\
     merge     merge entries of a database to another\n\
+    entry     add, delete, modify entries in a database\n\
     help      display this\n\
     version   print the version\n\
 \n\
@@ -65,6 +67,9 @@ int main(int argc, char* argv[]) {
 	} else if(!strcmp(argv[1], "merge")) {
 		argv[1] = argv[0];
 		return merge_main(argc - 1, argv + 1);
+	} else if(!strcmp(argv[1], "entry")) {
+		argv[1] = argv[0];
+		return entry_main(argc - 1, argv + 1);
 	} else if(!strcmp(argv[1], "help")) {
 		print_help();
 	} else if(!strcmp(argv[1], "version")) {
