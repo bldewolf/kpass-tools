@@ -76,3 +76,4 @@ void insert_entry(kpass_db *db, kpass_entry *e);
 
 void print_entry_diff(kpass_entry *a, kpass_entry *b);
 
+kpass_entry *init_entry();

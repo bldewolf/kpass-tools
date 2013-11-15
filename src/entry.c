@@ -75,7 +75,7 @@ int entry_main(int argc, char* argv[]) {
 	uint8_t pw_hash[32];
 	char* pw = NULL;
 	char c;
-	kpass_entry *new_entry = calloc(1, sizeof(kpass_entry));
+	kpass_entry *new_entry = init_entry();
 	kpass_entry search_entry = {{0}};
 	int new_fields = 0, search_fields = 0;
 	char *src = NULL, *out = NULL;
@@ -295,7 +295,7 @@ int entry_main(int argc, char* argv[]) {
 
 	if(mode == ADD) {
 		if(!force) {
-			if(-1 == find_entry_index_uuid(db, new_entry->uuid)) {
+			if(-1 != find_entry_index_uuid(db, new_entry->uuid)) {
 				fprintf(stderr, "UUID already exists in database.\n");
 				goto entry_main_cleanup;
 			}
@@ -309,7 +309,7 @@ int entry_main(int argc, char* argv[]) {
 	} else if(mode == MODIFY) { /* TODO: Modify more than the first one? */
 		if(!force) {
 			if((new_fields & BIT(kpass_entry_uuid)) &&
-				-1 == find_entry_index_uuid(db, new_entry->uuid)) {
+				-1 != find_entry_index_uuid(db, new_entry->uuid)) {
 				fprintf(stderr, "UUID already exists in database.\n");
 				goto entry_main_cleanup;
 			}
@@ -386,12 +386,14 @@ int entry_main(int argc, char* argv[]) {
 	save_db(out, db, pw_hash);
 
 	kpass_free_db(db);
-	kpass_free_entry(new_entry);
+	if(mode != ADD)
+		kpass_free_entry(new_entry);
 	return 0;
 
 entry_main_cleanup:
 	if(db)
 		kpass_free_db(db);
-	kpass_free_entry(new_entry);
+	if(mode != ADD)
+		kpass_free_entry(new_entry);
 	return 1;
 }

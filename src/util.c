@@ -583,3 +583,16 @@ void print_entry_diff(kpass_entry *a, kpass_entry *b) {
 		}
 	}
 }
+
+kpass_entry *init_entry() {
+	kpass_entry *e = calloc(1, sizeof(kpass_entry));
+
+	e->title = strdup("");
+	e->url = strdup("");
+	e->username = strdup("");
+	e->password = strdup("");
+	e->notes = strdup("");
+	e->desc = strdup("");
+
+	return e;
+}
