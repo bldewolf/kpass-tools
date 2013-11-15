@@ -39,6 +39,7 @@ General options:\n\
     -o        output database\n\
     -p        source database password\n\
     -f        disable safety checks (duplicate UUIDs, non-existent groups, etc)\n\
+    -j        disable timestamp updating\n\
     -h        this displays the help\n\
 \n\
 Set mode:\n\
@@ -83,10 +84,11 @@ int entry_main(int argc, char* argv[]) {
 	enum modes mode = 0;
 	char * pw_file = NULL;
 	int pw_prompt = 0;
+	int timestamps = 1;
 
 	/* XXX: Most of the fields can be overwritten except for the password.
 	 * Should we be consistent or lazy? */
-	while((c = getopt(argc, argv, "s:o:p:fadmt:r:n:u:g:i:w:W:kT:U:h")) != -1) {
+	while((c = getopt(argc, argv, "s:o:p:fjadmt:r:n:u:g:i:w:W:kT:U:h")) != -1) {
 		switch(c) {
 			case 's':
 				src = optarg;
@@ -99,6 +101,9 @@ int entry_main(int argc, char* argv[]) {
 				break;
 			case 'f':
 				force = 1;
+				break;
+			case 'j':
+				timestamps = 0;
 				break;
 			case 'a':
 				if(mode) {
@@ -291,6 +296,13 @@ int entry_main(int argc, char* argv[]) {
 		if(!(new_fields & BIT(kpass_entry_group_id))) {
 			new_entry->group_id = db->groups[0]->id;
 		}
+		if(timestamps) {
+			time_t t = time(NULL);
+			struct tm *tms = localtime(&t);
+			kpass_pack_time(tms, new_entry->ctime);
+			kpass_pack_time(tms, new_entry->mtime);
+			kpass_pack_time(tms, new_entry->atime);
+		}
 	}
 
 	if(mode == ADD) {
@@ -363,6 +375,13 @@ int entry_main(int argc, char* argv[]) {
 			free(e->password);
 			e->password = new_entry->password;
 			new_entry->password = NULL;
+		}
+
+		if(timestamps) {
+			time_t t = time(NULL);
+			struct tm *tms = localtime(&t);
+			kpass_pack_time(tms, e->mtime);
+			kpass_pack_time(tms, e->atime);
 		}
 	} else if(mode == DELETE) {
 		kpass_entry *e = NULL;

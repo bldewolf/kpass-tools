@@ -585,6 +585,7 @@ void print_entry_diff(kpass_entry *a, kpass_entry *b) {
 }
 
 kpass_entry *init_entry() {
+	char time[5] = { 0x2e, 0xdf, 0x39, 0x7e, 0xfb }; /* Magic "Never" time */
 	kpass_entry *e = calloc(1, sizeof(kpass_entry));
 
 	e->title = strdup("");
@@ -593,6 +594,11 @@ kpass_entry *init_entry() {
 	e->password = strdup("");
 	e->notes = strdup("");
 	e->desc = strdup("");
+
+	memcpy(e->ctime, time, 5);
+	memcpy(e->mtime, time, 5);
+	memcpy(e->atime, time, 5);
+	memcpy(e->etime, time, 5);
 
 	return e;
 }
