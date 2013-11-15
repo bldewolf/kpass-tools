@@ -268,7 +268,7 @@ int entry_main(int argc, char* argv[]) {
 		}
 	}
 	/* collect the new password interactively if it wasn't already */
-	if(pw_prompt || !new_entry->password) {
+	if(pw_prompt || !(new_fields & BIT(kpass_entry_password))) {
 		new_entry->password = strdup(getpass("New password:"));
 		char * confirm = getpass("Confirm:");
 
