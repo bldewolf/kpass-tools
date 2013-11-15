@@ -86,7 +86,7 @@ int entry_main(int argc, char* argv[]) {
 
 	/* XXX: Most of the fields can be overwritten except for the password.
 	 * Should we be consistent or lazy? */
-	while((c = getopt(argc, argv, "s:o:p:fadmt:r:n:u:g:i:w:WkT:U:h")) != -1) {
+	while((c = getopt(argc, argv, "s:o:p:fadmt:r:n:u:g:i:w:W:kT:U:h")) != -1) {
 		switch(c) {
 			case 's':
 				src = optarg;
