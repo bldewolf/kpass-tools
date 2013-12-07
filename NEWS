@@ -1,3 +1,9 @@
+Version 6, 20131206:
+Add "entry" menu option
+Fiddle with build stuff
+Bug fixes
+Version 5, 20121107:
+Build system changes, use new libkpass version
 Version 4, 20120822:
 Update gnulib to resolve some build errors
 Version 3, 20120712:

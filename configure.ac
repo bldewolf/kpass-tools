@@ -1,5 +1,5 @@
 AC_PREREQ([2.65])
-AC_INIT([kpass-tools], [5], [kpass-tools@bldewolf.com], [kpass-tools], [https://github.com/bldewolf/kpass-tools])
+AC_INIT([kpass-tools], [6], [kpass-tools@bldewolf.com], [kpass-tools], [https://github.com/bldewolf/kpass-tools])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([build-aux])
