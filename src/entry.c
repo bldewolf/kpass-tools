@@ -49,6 +49,7 @@ Set mode:\n\
 \n\
 Set entry fields for add/modify:\n\
     -t <str>  entry title\n\
+    -e <str>  entry username\n\
     -r <str>  entry URL\n\
     -n <str>  entry notes\n\
     -u <uuid> entry UUID (default: random)\n\
@@ -88,7 +89,7 @@ int entry_main(int argc, char* argv[]) {
 
 	/* XXX: Most of the fields can be overwritten except for the password.
 	 * Should we be consistent or lazy? */
-	while((c = getopt(argc, argv, "s:o:p:fjadmt:r:n:u:g:i:w:W:kT:U:h")) != -1) {
+	while((c = getopt(argc, argv, "s:o:p:fjadmt:e:r:n:u:g:i:w:W:kT:U:h")) != -1) {
 		switch(c) {
 			case 's':
 				src = optarg;
@@ -130,6 +131,11 @@ int entry_main(int argc, char* argv[]) {
 				if(new_entry->title) free(new_entry->title);
 				new_entry->title = strdup(optarg);
 				new_fields |= BIT(kpass_entry_title);
+				break;
+			case 'e':
+				if(new_entry->username) free(new_entry->username);
+				new_entry->username = strdup(optarg);
+				new_fields |= BIT(kpass_entry_username);
 				break;
 			case 'r':
 				if(new_entry->url) free(new_entry->url);
@@ -351,6 +357,11 @@ int entry_main(int argc, char* argv[]) {
 			free(e->title);
 			e->title = new_entry->title;
 			new_entry->title = NULL;
+		}
+		if(new_fields & BIT(kpass_entry_username)) {
+			free(e->username);
+			e->username = new_entry->username;
+			new_entry->username = NULL;
 		}
 		if(new_fields & BIT(kpass_entry_url)) {
 			free(e->url);
