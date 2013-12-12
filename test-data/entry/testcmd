@@ -1,0 +1,1 @@
+../../kpass-tools entry -s test.kdb -o output.kdb -m -U 4413ad4c-aafd-5690-4792-f993791e387e -W -
